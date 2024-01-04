@@ -17,15 +17,12 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideMoshi(): Moshi {
-//        return Moshi.Builder().build()
-//    }
+    private const val BASE_URL_MOCKY = "https://run.mocky.io"
+    private const val BASE_URL_REQRES = "https://reqres.in"
 
     @Provides
     @Singleton
-    fun retrofit(): Retrofit {
+    fun retrofitMocky(): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(
                 MoshiConverterFactory.create(
@@ -34,25 +31,37 @@ object AppModule {
                         .build()
                 )
             )
-            .baseUrl("https://run.mocky.io")
+            .baseUrl(BASE_URL_MOCKY)
             .build()
     }
-
-//    @Provides
-//    @Singleton
-//    fun retrofit(moshi: Moshi) : Retrofit {
-//        return Retrofit.Builder()
-//            .baseUrl("https://run.mocky.io")
-//            .addConverterFactory(MoshiConverterFactory.create(moshi))
-//            .build()
-//            .create(MockyApiService::class.java)
-//    }
 
     @Provides
     @Singleton
     fun provideMockyApiService(retrofit: Retrofit): MockyApiService {
         return retrofit.create(MockyApiService::class.java)
     }
+
+//    @Provides
+//    @Singleton
+//    fun retrofitReqres(): Retrofit {
+//        return Retrofit.Builder()
+//            .addConverterFactory(
+//                MoshiConverterFactory.create(
+//                    Moshi.Builder()
+//                        .add(KotlinJsonAdapterFactory())
+//                        .build()
+//                )
+//            )
+//            .baseUrl(BASE_URL_REQRES)
+//            .build()
+//    }
+//
+//    @Provides
+//    @Singleton
+//    fun provideReqresApiService(retrofit: Retrofit) : ReqresApiService {
+//        return retrofit.create(ReqresApiService::class.java)
+//    }
+
 
     @Provides
     @Singleton

@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface MockyApiService {
     @GET("/v3/7ec14eae-06bf-4f6d-86d2-ac1b9df5fe3d")
-    suspend fun getUsersDTO(): Response<List<UsersDTO>>
+    suspend fun getUsers(): Response<List<UsersDTO>>
 }

@@ -1,5 +1,6 @@
 package com.example.userlist.di
 
+//import com.example.userlist.data.repository.CurrentUserRepositoryImpl
 import com.example.userlist.data.common.HandleResponse
 import com.example.userlist.data.repository.UsersRepositoryImpl
 import com.example.userlist.data.service.MockyApiService
@@ -28,5 +29,14 @@ object RepositoryModule {
     ): UsersRepository {
         return UsersRepositoryImpl(mockyApiService, handleResponse)
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideCurrentUserRepository(
+//        reqresApiService: ReqresApiService,
+//        handleResponse: HandleResponse
+//    ): CurrentUserRepository {
+//        return CurrentUserRepositoryImpl(reqresApiService, handleResponse)
+//    }
 
 }

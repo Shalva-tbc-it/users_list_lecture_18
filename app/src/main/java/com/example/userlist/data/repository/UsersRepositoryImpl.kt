@@ -16,7 +16,7 @@ class UsersRepositoryImpl @Inject constructor(
 ) : UsersRepository {
 
     override suspend fun getUsers(): Flow<Resource<List<Users>>> {
-        return handleResponse.safeApiCall { apiService.getUsersDTO() }
+        return handleResponse.safeApiCall { apiService.getUsers() }
             .listToDomain { it.toDomain() }
 
     }
