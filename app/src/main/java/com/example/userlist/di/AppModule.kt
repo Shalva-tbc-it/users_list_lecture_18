@@ -1,7 +1,10 @@
 package com.example.userlist.di
 
 import com.example.userlist.data.service.MockyApiService
+import com.example.userlist.data.service.ReqresApiService
+import com.example.userlist.domain.repository.CurrentUserRepository
 import com.example.userlist.domain.repository.UsersRepository
+import com.example.userlist.domain.usecase.GetCurrentUserUseCase
 import com.example.userlist.domain.usecase.GetUsersUseCase
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -11,6 +14,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -22,6 +26,7 @@ object AppModule {
 
     @Provides
     @Singleton
+    @Named("RetrofitMocky")
     fun retrofitMocky(): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(
@@ -37,30 +42,31 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMockyApiService(retrofit: Retrofit): MockyApiService {
+    fun provideMockyApiService(@Named("RetrofitMocky") retrofit: Retrofit): MockyApiService {
         return retrofit.create(MockyApiService::class.java)
     }
 
-//    @Provides
-//    @Singleton
-//    fun retrofitReqres(): Retrofit {
-//        return Retrofit.Builder()
-//            .addConverterFactory(
-//                MoshiConverterFactory.create(
-//                    Moshi.Builder()
-//                        .add(KotlinJsonAdapterFactory())
-//                        .build()
-//                )
-//            )
-//            .baseUrl(BASE_URL_REQRES)
-//            .build()
-//    }
-//
-//    @Provides
-//    @Singleton
-//    fun provideReqresApiService(retrofit: Retrofit) : ReqresApiService {
-//        return retrofit.create(ReqresApiService::class.java)
-//    }
+    @Provides
+    @Singleton
+    @Named("RetrofitReqres")
+    fun retrofitReqres(): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(
+                MoshiConverterFactory.create(
+                    Moshi.Builder()
+                        .add(KotlinJsonAdapterFactory())
+                        .build()
+                )
+            )
+            .baseUrl(BASE_URL_REQRES)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideReqresApiService(@Named("RetrofitReqres") retrofit: Retrofit) : ReqresApiService {
+        return retrofit.create(ReqresApiService::class.java)
+    }
 
 
     @Provides
@@ -69,6 +75,10 @@ object AppModule {
         return GetUsersUseCase(repository = usersRepository)
     }
 
-
+    @Provides
+    @Singleton
+    fun provideGetCurrentUserUseCase(currentUserRepository: CurrentUserRepository) : GetCurrentUserUseCase {
+        return GetCurrentUserUseCase(repository = currentUserRepository)
+    }
 
 }

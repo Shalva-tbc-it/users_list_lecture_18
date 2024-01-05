@@ -1,10 +1,10 @@
-package com.example.userlist.data.mapper
+package com.example.userlist.domain.mapper
 
-import com.example.userlist.data.model.UsersDTO
 import com.example.userlist.domain.model.GetUsers
+import com.example.userlist.presentation.model.Users
 
-fun UsersDTO.toDomain() : GetUsers {
-    return GetUsers(
+fun GetUsers.toPresentation() : Users {
+    return Users(
         id = id,
         email = email,
         firstName = firstName,

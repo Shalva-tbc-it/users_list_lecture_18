@@ -1,14 +1,16 @@
 package com.example.userlist.presentation.home
 
-import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.userlist.data.common.Resource
-import com.example.userlist.domain.model.Users
 import com.example.userlist.domain.usecase.GetUsersUseCase
+import com.example.userlist.presentation.model.Users
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +21,10 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading(false))
-    val usersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
+    val getUsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
+
+    private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
+    val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
     init {
         getUsersList()
@@ -30,9 +35,11 @@ class HomeViewModel @Inject constructor(
             getUsersUseCase.invoke().collect {
                 _usersList.value = it
             }
-            val users = getUsersUseCase.invoke()
-            d("viewModelviewModel", "viewModel: $usersList")
         }
     }
 
+}
+
+sealed class NavigationEvent() {
+    data class NavigateToDetailsPage(val userId: Int) : NavigationEvent()
 }

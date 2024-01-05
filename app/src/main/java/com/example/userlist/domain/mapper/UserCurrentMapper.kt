@@ -1,10 +1,10 @@
-package com.example.userlist.data.mapper
+package com.example.userlist.domain.mapper
 
 import com.example.userlist.data.common.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-fun <T, DomainType> Flow<Resource<T>>.currentUserToDomain(currentUser: (T) -> DomainType): Flow<Resource<DomainType>> {
+fun <T, PresentationType> Flow<Resource<T>>.currentUserToPresentation(currentUser: (T) -> PresentationType): Flow<Resource<PresentationType>> {
     return map {
         when (it) {
             is Resource.Success -> Resource.Success(currentUser(it.data))

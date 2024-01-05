@@ -14,3 +14,7 @@ data class UsersDTO(
     @Json(name = "avatar")
     val avatar: String
 )
+
+data class UserResponse(
+    val data: UsersDTO
+)

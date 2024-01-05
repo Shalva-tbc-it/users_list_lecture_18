@@ -7,16 +7,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.userlist.databinding.RecyclerUserBinding
-import com.example.userlist.domain.model.Users
+import com.example.userlist.presentation.model.Users
 
 class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.UserListViewHolder>(UserListDiffCallback()) {
 
-    private var onItemClickListener: ((Users) -> Unit)? = null
+    private var onItemClickListener: ((Int) -> Unit)? = null
 
     inner class UserListViewHolder(private val binding: RecyclerUserBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind() = with(binding) {
-            val users = currentList[absoluteAdapterPosition]
 
+        fun bind() = with(binding) {
+            val users = currentList[adapterPosition]
             Glide.with(root)
                 .load(users.avatar)
                 .centerCrop()
@@ -25,13 +25,18 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
             tvEmail.text = users.email
             tvFirstName.text = users.firstName
             tvLastName.text = users.lastName
+
+            root.setOnClickListener {
+                onItemClickListener?.let {
+                    it.invoke(users.id)
+                }
+            }
         }
-
     }
-
-    fun setOnItemClickListener(listener: (Users) -> Unit) {
+    fun setOnItemClickListener(listener: (Int) -> Unit) {
         onItemClickListener = listener
     }
+
 
     class UserListDiffCallback : DiffUtil.ItemCallback<Users>() {
         override fun areItemsTheSame(oldItem: Users, newItem: Users): Boolean {
@@ -41,7 +46,6 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
         override fun areContentsTheSame(oldItem: Users, newItem: Users): Boolean {
             return oldItem == newItem
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListViewHolder {
@@ -57,6 +61,5 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
     override fun onBindViewHolder(holder: UserListViewHolder, position: Int) {
         holder.bind()
     }
-
 
 }

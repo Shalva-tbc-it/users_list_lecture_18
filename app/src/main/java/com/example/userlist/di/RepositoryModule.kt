@@ -2,8 +2,11 @@ package com.example.userlist.di
 
 //import com.example.userlist.data.repository.CurrentUserRepositoryImpl
 import com.example.userlist.data.common.HandleResponse
+import com.example.userlist.data.repository.CurrentUserRepositoryImpl
 import com.example.userlist.data.repository.UsersRepositoryImpl
 import com.example.userlist.data.service.MockyApiService
+import com.example.userlist.data.service.ReqresApiService
+import com.example.userlist.domain.repository.CurrentUserRepository
 import com.example.userlist.domain.repository.UsersRepository
 import dagger.Module
 import dagger.Provides
@@ -30,13 +33,13 @@ object RepositoryModule {
         return UsersRepositoryImpl(mockyApiService, handleResponse)
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideCurrentUserRepository(
-//        reqresApiService: ReqresApiService,
-//        handleResponse: HandleResponse
-//    ): CurrentUserRepository {
-//        return CurrentUserRepositoryImpl(reqresApiService, handleResponse)
-//    }
+    @Provides
+    @Singleton
+    fun provideCurrentUserRepository(
+        reqresApiService: ReqresApiService,
+        handleResponse: HandleResponse
+    ): CurrentUserRepository {
+        return CurrentUserRepositoryImpl(reqresApiService, handleResponse)
+    }
 
 }

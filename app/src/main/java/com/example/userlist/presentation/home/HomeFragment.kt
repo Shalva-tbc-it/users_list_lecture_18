@@ -6,6 +6,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.userlist.data.common.Resource
 import com.example.userlist.databinding.FragmentHomeBinding
@@ -19,6 +20,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var adapter: UserListRecyclerAdapter
+
     override fun start() {
         setAdapter()
         observe()
@@ -28,10 +30,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         getUserId()
     }
 
+
     private fun getUserId() {
         adapter.setOnItemClickListener(
             listener = {
-
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment(it)
+                )
             }
         )
     }
@@ -46,14 +51,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun observe() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.usersList.collect {
-                    when(it) {
+                viewModel.getUsersList.collect {
+                    when (it) {
                         is Resource.Loading -> showProgressBar() // it's stay visibile
 
                         is Resource.Error -> {
-                            Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG)
+                                .show()
                             binding.progressBar.visibility = View.GONE
                         }
+
                         is Resource.Success -> {
                             adapter.submitList(it.data)
                             binding.progressBar.visibility = View.GONE
@@ -67,6 +74,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             }
         }
     }
+
+//    private fun navEvent(navigationEvent: NavigationEvent) {
+//        when(navigationEvent) {
+//            is NavigationEvent.NavigateToDetailsPage -> {
+//                findNavController().navigate(
+//                    HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment()
+//                )
+//            }
+//        }
+//    }
 
     private fun showProgressBar() {
         binding.progressBar.visibility = View.GONE
