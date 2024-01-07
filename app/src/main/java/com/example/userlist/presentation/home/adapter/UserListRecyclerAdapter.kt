@@ -30,10 +30,12 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
             root.setOnLongClickListener {
                 onItemLongClickListener?.let {
                     it.invoke(users.id)
+
                     return@setOnLongClickListener true
                 }
                 return@setOnLongClickListener false
             }
+
             root.setOnClickListener {
                 onItemClickListener?.let {
                     it.invoke(users.id)

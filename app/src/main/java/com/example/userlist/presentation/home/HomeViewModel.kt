@@ -55,6 +55,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _excludedUserIds.value = id
         }
+        if (id.isEmpty()) {
+            _excludedUserIds.value = emptyList()
+        }
         getUsersList()
     }
 

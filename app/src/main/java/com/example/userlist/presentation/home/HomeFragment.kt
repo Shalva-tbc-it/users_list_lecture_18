@@ -50,6 +50,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun clearUsersId() {
         binding.btnClearUsersId.setOnClickListener {
+            userId.clear()
             viewModel.userId(mutableListOf())
             btnGone()
         }
