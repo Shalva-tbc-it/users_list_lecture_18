@@ -51,7 +51,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun clearUsersId() {
         binding.btnClearUsersId.setOnClickListener {
             userId.clear()
-            viewModel.userId(mutableListOf())
+            viewModel.userId(userId)
             btnGone()
         }
     }
@@ -78,7 +78,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         adapter.setOnItemClickListener(
             listener = {
                 if (binding.btnDeleteUsers.isVisible) {
-                    userId.add(it)
+                    if (userId.contains(it)) {
+                        userId.remove(it)
+                    } else {
+                        userId.add(it)
+                    }
                 } else {
                     viewModel.listener(it)
                 }

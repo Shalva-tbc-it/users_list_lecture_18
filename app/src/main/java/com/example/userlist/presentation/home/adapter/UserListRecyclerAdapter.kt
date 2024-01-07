@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.userlist.R
 import com.example.userlist.databinding.RecyclerUserBinding
 import com.example.userlist.presentation.model.Users
 
@@ -13,6 +14,7 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
     private var onItemClickListener: ((Int) -> Unit)? = null
     private var onItemLongClickListener: ((Int) -> Unit)? = null
+    private var activeUserBg = ArrayList<Users>()
 
     inner class UserListViewHolder(private val binding: RecyclerUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -30,7 +32,8 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
             root.setOnLongClickListener {
                 onItemLongClickListener?.let {
                     it.invoke(users.id)
-
+                    binding.root.setBackgroundResource(R.drawable.bg_active_user)
+                    activeUserBg.add(users)
                     return@setOnLongClickListener true
                 }
                 return@setOnLongClickListener false
@@ -38,11 +41,18 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
             root.setOnClickListener {
                 onItemClickListener?.let {
-                    it.invoke(users.id)
+                    if (!activeUserBg.contains(users)) {
+                        it.invoke(users.id)
+                        binding.root.setBackgroundResource(R.drawable.bg_active_user)
+                        activeUserBg.add(users)
+                    } else {
+                        it.invoke(users.id)
+                        binding.root.setBackgroundResource(0)
+                        activeUserBg.remove(users)
+                    }
+
                 }
             }
-
-
         }
     }
     fun setOnItemClickListener(listener: (Int) -> Unit) {
@@ -51,7 +61,6 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
     fun setonItemLongClickListener(longClickListener: (Int) -> Unit) {
         onItemLongClickListener = longClickListener
     }
-
 
     class UserListDiffCallback : DiffUtil.ItemCallback<Users>() {
         override fun areItemsTheSame(oldItem: Users, newItem: Users): Boolean {
@@ -75,6 +84,9 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
     override fun onBindViewHolder(holder: UserListViewHolder, position: Int) {
         holder.bind()
+        holder.itemView.setBackgroundResource(0)
+
+
     }
 
 }
