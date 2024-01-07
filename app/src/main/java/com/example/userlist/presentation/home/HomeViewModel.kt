@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,16 +27,35 @@ class HomeViewModel @Inject constructor(
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
+    private val _excludedUserIds = MutableStateFlow<List<Int>>(emptyList())
+    val excludedUserIds: StateFlow<List<Int>> = _excludedUserIds.asStateFlow()
+
+
     init {
         getUsersList()
     }
 
     private fun getUsersList() {
         viewModelScope.launch {
-            getUsersUseCase.invoke().collect {
+            getUsersUseCase.invoke().map { resource ->
+                if (resource is Resource.Success) {
+                    resource.copy(data = resource.data.filterNot { user ->
+                        user.id in excludedUserIds.value
+                    })
+                } else {
+                    resource
+                }
+            }.collect {
                 _usersList.value = it
             }
         }
+    }
+
+    fun userId(id: MutableList<Int>) {
+        viewModelScope.launch {
+            _excludedUserIds.value = id
+        }
+        getUsersList()
     }
 
     fun listener(id: Int) {

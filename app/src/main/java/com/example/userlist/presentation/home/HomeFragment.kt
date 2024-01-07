@@ -1,13 +1,16 @@
 package com.example.userlist.presentation.home
 
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.userlist.R
 import com.example.userlist.data.common.Resource
 import com.example.userlist.databinding.FragmentHomeBinding
 import com.example.userlist.presentation.base.BaseFragment
@@ -20,6 +23,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var adapter: UserListRecyclerAdapter
+    private val userId: MutableList<Int> = mutableListOf()
 
     override fun start() {
         setAdapter()
@@ -28,6 +32,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun clickListener() {
         getUserId()
+        deleteUsers()
+        clearUsersId()
     }
 
     private fun observe() {
@@ -35,23 +41,63 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setNavEvent()
     }
 
+    private fun deleteUsers() {
+        binding.btnDeleteUsers.setOnClickListener {
+            viewModel.userId(userId)
+            btnGone()
+        }
+    }
+
+    private fun clearUsersId() {
+        binding.btnClearUsersId.setOnClickListener {
+            viewModel.userId(mutableListOf())
+            btnGone()
+        }
+    }
+
+    private fun btnGone() {
+        val animationGone =
+            AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        binding.btnDeleteUsers.visibility = View.GONE
+        binding.btnClearUsersId.visibility = View.GONE
+        binding.btnClearUsersId.startAnimation(animationGone)
+        binding.btnDeleteUsers.startAnimation(animationGone)
+    }
+
+    private fun btnVisible() {
+        val animationVisible =
+            AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        binding.btnDeleteUsers.visibility = View.VISIBLE
+        binding.btnClearUsersId.visibility = View.VISIBLE
+        binding.btnClearUsersId.startAnimation(animationVisible)
+        binding.btnDeleteUsers.startAnimation(animationVisible)
+    }
+
     private fun getUserId() {
         adapter.setOnItemClickListener(
             listener = {
-                viewModel.listener(it)
+                if (binding.btnDeleteUsers.isVisible) {
+                    userId.add(it)
+                } else {
+                    viewModel.listener(it)
+                }
+
+            }
+        )
+
+        adapter.setonItemLongClickListener(
+            longClickListener = {
+                userId.add(it)
+                btnVisible()
             }
         )
     }
-
 
     private fun setAdapter() {
         adapter = UserListRecyclerAdapter()
         binding.recyclerUsersList.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerUsersList.adapter = adapter
     }
-
-
-
 
     private fun getUser() {
         viewLifecycleOwner.lifecycleScope.launch {

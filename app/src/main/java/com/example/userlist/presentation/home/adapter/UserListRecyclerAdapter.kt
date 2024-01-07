@@ -12,6 +12,7 @@ import com.example.userlist.presentation.model.Users
 class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.UserListViewHolder>(UserListDiffCallback()) {
 
     private var onItemClickListener: ((Int) -> Unit)? = null
+    private var onItemLongClickListener: ((Int) -> Unit)? = null
 
     inner class UserListViewHolder(private val binding: RecyclerUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -26,15 +27,27 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
             tvFirstName.text = users.firstName
             tvLastName.text = users.lastName
 
+            root.setOnLongClickListener {
+                onItemLongClickListener?.let {
+                    it.invoke(users.id)
+                    return@setOnLongClickListener true
+                }
+                return@setOnLongClickListener false
+            }
             root.setOnClickListener {
                 onItemClickListener?.let {
                     it.invoke(users.id)
                 }
             }
+
+
         }
     }
     fun setOnItemClickListener(listener: (Int) -> Unit) {
         onItemClickListener = listener
+    }
+    fun setonItemLongClickListener(longClickListener: (Int) -> Unit) {
+        onItemLongClickListener = longClickListener
     }
 
 
