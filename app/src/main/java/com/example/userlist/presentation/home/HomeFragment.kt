@@ -30,16 +30,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         getUserId()
     }
 
+    private fun observe() {
+        getUser()
+        setNavEvent()
+    }
 
     private fun getUserId() {
         adapter.setOnItemClickListener(
             listener = {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment(it)
-                )
+                viewModel.listener(it)
             }
         )
     }
+
 
     private fun setAdapter() {
         adapter = UserListRecyclerAdapter()
@@ -48,12 +51,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
 
-    private fun observe() {
+
+
+    private fun getUser() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getUsersList.collect {
+                viewModel.UsersList.collect {
                     when (it) {
-                        is Resource.Loading -> showProgressBar() // it's stay visibile
+                        is Resource.Loading -> showProgressBar()
 
                         is Resource.Error -> {
                             Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG)
@@ -67,7 +72,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                         }
 
                         else -> {
-
+                            Toast.makeText(requireContext(), "App error", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -75,18 +80,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
-//    private fun navEvent(navigationEvent: NavigationEvent) {
-//        when(navigationEvent) {
-//            is NavigationEvent.NavigateToDetailsPage -> {
-//                findNavController().navigate(
-//                    HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment()
-//                )
-//            }
-//        }
-//    }
+    private fun setNavEvent() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationEvent.collect { navigationEvent ->
+                    navEvent(navigationEvent)
+                }
+            }
+        }
+    }
+
+    private fun navEvent(navigationEvent: NavigationEvent) {
+        when (navigationEvent) {
+            is NavigationEvent.NavigateToCurrentUser -> {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment(navigationEvent.userId)
+                )
+            }
+        }
+    }
 
     private fun showProgressBar() {
-        binding.progressBar.visibility = View.GONE
+        binding.progressBar.visibility = View.VISIBLE
     }
 
 }

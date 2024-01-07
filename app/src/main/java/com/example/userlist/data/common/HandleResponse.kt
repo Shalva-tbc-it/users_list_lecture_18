@@ -7,43 +7,35 @@ import java.io.IOException
 
 class HandleResponse {
     suspend fun <T : Any> safeApiCall(apiCall: suspend () -> Response<List<T>>): Flow<Resource<List<T>>> = flow {
-        emit(Resource.Loading(true))
+        emit(Resource.Loading())
         try {
             val response = apiCall()
             if (response.isSuccessful) {
                 emit(Resource.Success(response.body() ?: emptyList()))
-                emit(Resource.Loading(false))
             } else {
                 emit(Resource.Error("Error Code: ${response.code()}"))
-                emit(Resource.Loading(false))
             }
         } catch (e: IOException) {
             emit(Resource.Error("Network error: $e"))
-            emit(Resource.Loading(false))
         } catch (e: Throwable) {
             emit(Resource.Error("Unknown error: $e"))
-            emit(Resource.Loading(false))
         }
     }
 
     suspend fun <T : Any> apiCall(apiCall: suspend () -> Response<T>): Flow<Resource<T>> = flow {
-        emit(Resource.Loading(true))
+        emit(Resource.Loading())
         try {
             val response = apiCall()
             if (response.isSuccessful) {
                 response.body()?.let { emit(Resource.Success(it)) }
                     ?: "Empty response body"
-                emit(Resource.Loading(false))
             } else {
                 emit(Resource.Error("Error Code: ${response.code()}"))
-                emit(Resource.Loading(false))
             }
         } catch (e: IOException) {
             emit(Resource.Error("Network error: $e"))
-            emit(Resource.Loading(false))
         } catch (e: Throwable) {
             emit(Resource.Error("Unknown error: $e"))
-            emit(Resource.Loading(false))
         }
     }
 

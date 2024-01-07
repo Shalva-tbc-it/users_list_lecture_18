@@ -20,8 +20,8 @@ class HomeViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase
 ) : ViewModel() {
 
-    private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading(false))
-    val getUsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
+    private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading())
+    val UsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
@@ -38,8 +38,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun listener(id: Int) {
+        viewModelScope.launch {
+            _navigationEvent.emit(NavigationEvent.NavigateToCurrentUser(userId = id))
+        }
+    }
+
 }
 
 sealed class NavigationEvent() {
-    data class NavigateToDetailsPage(val userId: Int) : NavigationEvent()
+    data class NavigateToCurrentUser(val userId: Int) : NavigationEvent()
 }

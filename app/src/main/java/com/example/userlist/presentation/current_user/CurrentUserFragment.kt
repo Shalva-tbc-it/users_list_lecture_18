@@ -1,5 +1,6 @@
 package com.example.userlist.presentation.current_user
 
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -29,11 +30,16 @@ class CurrentUserFragment : BaseFragment<FragmentCurrentUserBinding>(FragmentCur
     }
 
     private fun observe() {
+        getUser()
+    }
+
+    private fun getUser() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser.collectLatest {
                     when (it) {
                         is Resource.Loading -> showProgressBar()
+
                         is Resource.Success -> {
                             val user = it.data
                             binding.apply {
@@ -44,12 +50,16 @@ class CurrentUserFragment : BaseFragment<FragmentCurrentUserBinding>(FragmentCur
                                 tvFirstName.text = user.firstName
                                 tvLastName.text = user.lastName
                             }
+                            binding.progressBar.visibility = View.GONE
                         }
+
                         is Resource.Error -> {
                             Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG).show()
+                            binding.progressBar.visibility = View.GONE
                         }
-                        else -> {
 
+                        else -> {
+                            Toast.makeText(requireContext(), "App error", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -59,7 +69,7 @@ class CurrentUserFragment : BaseFragment<FragmentCurrentUserBinding>(FragmentCur
 
 
     private fun showProgressBar() {
-
+        binding.progressBar.visibility = View.VISIBLE
     }
 
 }

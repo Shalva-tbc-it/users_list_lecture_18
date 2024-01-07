@@ -9,7 +9,7 @@ fun <T, DomainType> Flow<Resource<T>>.currentUserToDomain(currentUser: (T) -> Do
         when (it) {
             is Resource.Success -> Resource.Success(currentUser(it.data))
             is Resource.Error -> Resource.Error(it.errorMessage)
-            is Resource.Loading -> Resource.Loading(false)
+            is Resource.Loading -> Resource.Loading()
         }
     }
 }

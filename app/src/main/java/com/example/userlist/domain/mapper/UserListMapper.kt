@@ -9,7 +9,7 @@ fun <T, PresentationType> Flow<Resource<List<T>>>.listToPresentation(toList: (T)
         when (it) {
             is Resource.Success -> Resource.Success(it.data.map(toList))
             is Resource.Error -> Resource.Error(it.errorMessage)
-            is Resource.Loading -> Resource.Loading(false)
+            is Resource.Loading -> Resource.Loading()
         }
     }
 }

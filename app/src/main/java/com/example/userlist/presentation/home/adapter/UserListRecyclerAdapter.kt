@@ -16,7 +16,7 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
     inner class UserListViewHolder(private val binding: RecyclerUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind() = with(binding) {
-            val users = currentList[adapterPosition]
+            val users = currentList[absoluteAdapterPosition]
             Glide.with(root)
                 .load(users.avatar)
                 .centerCrop()

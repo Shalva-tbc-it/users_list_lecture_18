@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CurrentUserViewModel @Inject constructor(
     private val currentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
-    private val _currentUser = MutableStateFlow<Resource<Users>?>(Resource.Loading(false))
+    private val _currentUser = MutableStateFlow<Resource<Users>?>(Resource.Loading())
     val getUser: StateFlow<Resource<Users>?> = _currentUser.asStateFlow()
 
     fun getCurrentUser(id: Int) {

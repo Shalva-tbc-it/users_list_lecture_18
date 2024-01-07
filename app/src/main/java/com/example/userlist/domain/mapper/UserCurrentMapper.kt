@@ -9,7 +9,7 @@ fun <T, PresentationType> Flow<Resource<T>>.currentUserToPresentation(currentUse
         when (it) {
             is Resource.Success -> Resource.Success(currentUser(it.data))
             is Resource.Error -> Resource.Error(it.errorMessage)
-            is Resource.Loading -> Resource.Loading(false)
+            is Resource.Loading -> Resource.Loading()
         }
     }
 }
