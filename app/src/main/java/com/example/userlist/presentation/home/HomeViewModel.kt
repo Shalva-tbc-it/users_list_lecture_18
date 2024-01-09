@@ -35,6 +35,12 @@ class HomeViewModel @Inject constructor(
         getUsersList()
     }
 
+    fun onEvent(event: OnEvent) {
+        when(event) {
+            is OnEvent.Listener -> getListener(id = event.userId)
+        }
+    }
+
     private fun getUsersList() {
         viewModelScope.launch {
             getUsersUseCase.invoke().map { resource ->
@@ -61,12 +67,16 @@ class HomeViewModel @Inject constructor(
         getUsersList()
     }
 
-    fun listener(id: Int) {
+    private fun getListener(id: Int) {
         viewModelScope.launch {
             _navigationEvent.emit(NavigationEvent.NavigateToCurrentUser(userId = id))
         }
     }
 
+}
+
+sealed class OnEvent() {
+    data class Listener(val userId: Int) : OnEvent()
 }
 
 sealed class NavigationEvent() {

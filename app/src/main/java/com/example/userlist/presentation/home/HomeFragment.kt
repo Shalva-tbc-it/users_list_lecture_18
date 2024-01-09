@@ -84,7 +84,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                         userId.add(it)
                     }
                 } else {
-                    viewModel.listener(it)
+                    viewModel.onEvent(OnEvent.Listener(it))
                 }
 
             }

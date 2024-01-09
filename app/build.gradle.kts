@@ -21,6 +21,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL_MOCKY", "\"https://run.mocky.io\"")
+            buildConfigField("String", "BASE_URL_REQRES", "\"https://reqres.in\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -38,6 +42,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

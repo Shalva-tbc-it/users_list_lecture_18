@@ -1,5 +1,6 @@
 package com.example.userlist.di
 
+import com.example.userlist.BuildConfig
 import com.example.userlist.data.service.MockyApiService
 import com.example.userlist.data.service.ReqresApiService
 import com.example.userlist.domain.repository.CurrentUserRepository
@@ -21,9 +22,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val BASE_URL_MOCKY = "https://run.mocky.io"
-    private const val BASE_URL_REQRES = "https://reqres.in"
-
     @Provides
     @Singleton
     @Named("RetrofitMocky")
@@ -36,9 +34,10 @@ object AppModule {
                         .build()
                 )
             )
-            .baseUrl(BASE_URL_MOCKY)
+            .baseUrl(BuildConfig.BASE_URL_MOCKY)
             .build()
     }
+
 
     @Provides
     @Singleton
@@ -58,7 +57,7 @@ object AppModule {
                         .build()
                 )
             )
-            .baseUrl(BASE_URL_REQRES)
+            .baseUrl(BuildConfig.BASE_URL_REQRES)
             .build()
     }
 
@@ -67,7 +66,6 @@ object AppModule {
     fun provideReqresApiService(@Named("RetrofitReqres") retrofit: Retrofit) : ReqresApiService {
         return retrofit.create(ReqresApiService::class.java)
     }
-
 
     @Provides
     @Singleton

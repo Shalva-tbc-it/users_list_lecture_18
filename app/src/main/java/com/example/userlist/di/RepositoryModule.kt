@@ -1,6 +1,5 @@
 package com.example.userlist.di
 
-//import com.example.userlist.data.repository.CurrentUserRepositoryImpl
 import com.example.userlist.data.common.HandleResponse
 import com.example.userlist.data.repository.CurrentUserRepositoryImpl
 import com.example.userlist.data.repository.UsersRepositoryImpl
