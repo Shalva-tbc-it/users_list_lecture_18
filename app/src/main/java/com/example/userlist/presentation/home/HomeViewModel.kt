@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,14 +20,20 @@ class HomeViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase
 ) : ViewModel() {
 
-    private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading())
-    val UsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
+//    private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading())
+//    val UsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
+
+    private val _usersList = MutableStateFlow<List<Users>>(emptyList())
+    val usersList: StateFlow<List<Users>> = _usersList.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<NavigationEvent>()
     val navigationEvent: SharedFlow<NavigationEvent> = _navigationEvent.asSharedFlow()
 
-    private val _excludedUserIds = MutableStateFlow<List<Int>>(emptyList())
-    val excludedUserIds: StateFlow<List<Int>> = _excludedUserIds.asStateFlow()
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
+
+//    private val _excludedUserIds = MutableStateFlow<List<Int>>(emptyList())
+//    val excludedUserIds: StateFlow<List<Int>> = _excludedUserIds.asStateFlow()
 
 
     init {
@@ -38,33 +43,60 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: OnEvent) {
         when(event) {
             is OnEvent.Listener -> getListener(id = event.userId)
+            is OnEvent.Filter -> getUsersList()
+            is OnEvent.IsSelect -> getUserForDeleteCheck(users = event.users)
+            is OnEvent.IsUnSelect -> getUserForDeleteUncheck(users = event.users)
+            is OnEvent.DeleteUsers -> deleteUser()
         }
     }
 
     private fun getUsersList() {
         viewModelScope.launch {
-            getUsersUseCase.invoke().map { resource ->
-                if (resource is Resource.Success) {
-                    resource.copy(data = resource.data.filterNot { user ->
-                        user.id in excludedUserIds.value
-                    })
-                } else {
-                    resource
+            getUsersUseCase.invoke().collect { resource ->
+                when(resource) {
+                    is Resource.Success -> {
+                        _usersList.value = resource.data.map { it.copy(errorStatus = Users.Status.SUCCESS) }
+                        _loading.value = false
+                    }
+                    is Resource.Error -> {
+                        _usersList.value = _usersList.value.map { it.copy(errorStatus = Users.Status.ERROR) }
+                        _loading.value = false
+                    }
+                    is Resource.Loading -> {
+                        _loading.value = true
+                    }
                 }
-            }.collect {
-                _usersList.value = it
             }
+//            getUsersUseCase.invoke().map { resource ->
+//                if (resource is Resource.Success) {
+//                    resource.copy(data = resource.data.filterNot { user ->
+//                        user.id in excludedUserIds.value
+//                    })
+//                } else {
+//                    resource
+//                }
+//            }.collect {
+//                _usersList.value = _usersList.value.map { it.copy(isSelect = false) }
+//            }
         }
     }
 
-    fun userId(id: MutableList<Int>) {
-        viewModelScope.launch {
-            _excludedUserIds.value = id
+    private fun deleteUser() {
+        _usersList.value = _usersList.value.filterNot { user ->
+            user.isSelect
         }
-        if (id.isEmpty()) {
-            _excludedUserIds.value = emptyList()
+    }
+
+    private fun getUserForDeleteCheck(users: Users) {
+        _usersList.value = _usersList.value.map {
+            if (it.id == users.id) it.copy(isSelect = true) else it
         }
-        getUsersList()
+    }
+
+    private fun getUserForDeleteUncheck(users: Users) {
+        _usersList.value = _usersList.value.map {
+            if (it.id == users.id) it.copy(isSelect = false) else it
+        }
     }
 
     private fun getListener(id: Int) {
@@ -73,12 +105,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-}
+//    private fun userId(id: MutableList<Int>) {
+//        viewModelScope.launch {
+//            _excludedUserIds.value = id
+//        }
+//        if (id.isEmpty()) {
+//            _excludedUserIds.value = emptyList()
+//        }
+//        getUsersList()
+//    }
 
-sealed class OnEvent() {
-    data class Listener(val userId: Int) : OnEvent()
-}
 
-sealed class NavigationEvent() {
-    data class NavigateToCurrentUser(val userId: Int) : NavigationEvent()
+
 }

@@ -9,6 +9,8 @@ fun GetUsers.toPresentation() : Users {
         email = email,
         firstName = firstName,
         lastName = lastName,
-        avatar = avatar
+        avatar = avatar,
+        isSelect = false,
+        errorStatus = Users.Status.SUCCESS
     )
 }

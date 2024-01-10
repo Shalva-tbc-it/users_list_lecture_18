@@ -5,5 +5,13 @@ data class Users (
     val email: String,
     val firstName: String,
     val lastName: String,
-    val avatar: String
-)
+    val avatar: String,
+    val isSelect: Boolean = false,
+    val errorStatus: Status
+) {
+    enum class Status() {
+        SUCCESS,
+        ERROR
+    }
+}
+

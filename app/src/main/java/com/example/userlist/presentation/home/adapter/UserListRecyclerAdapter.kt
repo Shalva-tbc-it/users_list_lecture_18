@@ -12,9 +12,9 @@ import com.example.userlist.presentation.model.Users
 
 class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.UserListViewHolder>(UserListDiffCallback()) {
 
-    private var onItemClickListener: ((Int) -> Unit)? = null
-    private var onItemLongClickListener: ((Int) -> Unit)? = null
-    private var activeUserBg = ArrayList<Users>()
+    private var onItemClickListener: ((Users) -> Unit)? = null
+    private var onItemLongClickListener: ((Users) -> Unit)? = null
+//    private var activeUserBg = ArrayList<Users>()
 
     inner class UserListViewHolder(private val binding: RecyclerUserBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -31,9 +31,14 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
             root.setOnLongClickListener {
                 onItemLongClickListener?.let {
-                    it.invoke(users.id)
-                    binding.root.setBackgroundResource(R.drawable.bg_active_user)
-                    activeUserBg.add(users)
+                    it.invoke(users)
+                    if (users.isSelect) {
+                        binding.root.setBackgroundResource(R.drawable.bg_active_user)
+                    } else {
+                        binding.root.setBackgroundResource(0)
+
+                    }
+//                    activeUserBg.add(users)
                     return@setOnLongClickListener true
                 }
                 return@setOnLongClickListener false
@@ -41,24 +46,24 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
             root.setOnClickListener {
                 onItemClickListener?.let {
-                    if (!activeUserBg.contains(users)) {
-                        it.invoke(users.id)
+                    if (users.isSelect) {
+                        it.invoke(users)
                         binding.root.setBackgroundResource(R.drawable.bg_active_user)
-                        activeUserBg.add(users)
+//                        activeUserBg.add(users)
                     } else {
-                        it.invoke(users.id)
+                        it.invoke(users)
                         binding.root.setBackgroundResource(0)
-                        activeUserBg.remove(users)
+//                        activeUserBg.remove(users)
                     }
 
                 }
             }
         }
     }
-    fun setOnItemClickListener(listener: (Int) -> Unit) {
+    fun setOnItemClickListener(listener: (Users) -> Unit) {
         onItemClickListener = listener
     }
-    fun setonItemLongClickListener(longClickListener: (Int) -> Unit) {
+    fun setonItemLongClickListener(longClickListener: (Users) -> Unit) {
         onItemLongClickListener = longClickListener
     }
 
@@ -84,8 +89,7 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
     override fun onBindViewHolder(holder: UserListViewHolder, position: Int) {
         holder.bind()
-        holder.itemView.setBackgroundResource(0)
-
+//        holder.itemView.setBackgroundResource(0)
 
     }
 
