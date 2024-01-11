@@ -1,7 +1,8 @@
-package com.example.userlist.presentation.home
+package com.example.userlist.presentation.screen.home
 
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.userlist.R
 import com.example.userlist.databinding.FragmentHomeBinding
 import com.example.userlist.presentation.base.BaseFragment
-import com.example.userlist.presentation.home.adapter.UserListRecyclerAdapter
-import com.example.userlist.presentation.model.Users
+import com.example.userlist.presentation.screen.home.adapter.UserListRecyclerAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -37,6 +38,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun observe() {
         getUser()
         setNavEvent()
+        loader()
+        handleError()
+    }
+
+    private fun loader() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loading.collectLatest { loader ->
+                    if (loader) {
+                        binding.progressBar.visibility = View.VISIBLE
+                    } else {
+                        binding.progressBar.visibility = View.GONE
+                    }
+                }
+            }
+        }
     }
 
     private fun deleteUsers() {
@@ -48,14 +65,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private fun clearUsersId() {
         binding.btnClearUsersId.setOnClickListener {
-            viewModel.onEvent(event = OnEvent.Filter(mutableListOf()))
+            viewModel.onEvent(event = OnEvent.CleanData)
             btnGone()
         }
     }
 
     private fun btnGone() {
-        val animationGone =
-            AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        val animationGone = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
         binding.btnDeleteUsers.visibility = View.GONE
         binding.btnClearUsersId.visibility = View.GONE
         binding.btnClearUsersId.startAnimation(animationGone)
@@ -63,38 +79,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun btnVisible() {
-        val animationVisible =
-            AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        val animationVisible = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
         binding.btnDeleteUsers.visibility = View.VISIBLE
         binding.btnClearUsersId.visibility = View.VISIBLE
         binding.btnClearUsersId.startAnimation(animationVisible)
         binding.btnDeleteUsers.startAnimation(animationVisible)
     }
 
-
-
     private fun getUserId() {
-        adapter.setOnItemClickListener(
-            listener = {
-                if (binding.btnDeleteUsers.isVisible) {
-                    if (it.isSelect) {
-                        viewModel.onEvent(OnEvent.IsUnSelect(it))
-                    } else {
-                        viewModel.onEvent(OnEvent.IsSelect(it))
-                    }
+        adapter.setOnItemClickListener(listener = {
+            if (binding.btnDeleteUsers.isVisible) {
+                if (it.isSelect) {
+                    viewModel.onEvent(OnEvent.IsUnSelect(it))
                 } else {
-                    viewModel.onEvent(OnEvent.Listener(it.id))
+                    viewModel.onEvent(OnEvent.IsSelect(it))
                 }
-
+            } else {
+                viewModel.onEvent(OnEvent.Listener(it.id))
             }
-        )
 
-        adapter.setonItemLongClickListener(
-            longClickListener = {
-                viewModel.onEvent(OnEvent.IsSelect(it))
-                btnVisible()
-            }
-        )
+        })
+
+        adapter.setonItemLongClickListener(longClickListener = {
+            viewModel.onEvent(OnEvent.IsSelect(it))
+            btnVisible()
+        })
     }
 
     private fun setAdapter() {
@@ -107,46 +116,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.usersList.collect { users ->
-                    when {
-                         users.any { it.errorStatus == Users.Status.ERROR } -> {
-
-                         }
-                        else -> {
-                            adapter.submitList(users)
-                        }
-                    }
-
+                    adapter.submitList(users)
                 }
             }
         }
     }
 
-//    private fun getUser() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.UsersList.collect {
-//                    when (it) {
-//                        is Resource.Loading -> showProgressBar()
-//
-//                        is Resource.Error -> {
-//                            Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG)
-//                                .show()
-//                            binding.progressBar.visibility = View.GONE
-//                        }
-//
-//                        is Resource.Success -> {
-//                            adapter.submitList(it.data)
-//                            binding.progressBar.visibility = View.GONE
-//                        }
-//
-//                        else -> {
-//                            Toast.makeText(requireContext(), "App error", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private fun handleError() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.errorMessage.collect { error ->
+                    error?.let {
+                        Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
 
     private fun setNavEvent() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -165,14 +151,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     HomeFragmentDirections.actionHomeFragmentToCurrentUserFragment(navigationEvent.userId)
                 )
             }
-            else -> {
 
-            }
         }
-    }
-
-    private fun showProgressBar() {
-        binding.progressBar.visibility = View.VISIBLE
     }
 
 }

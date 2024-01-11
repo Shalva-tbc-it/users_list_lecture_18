@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    tools:context=".presentation.current_user.CurrentUserFragment">
+    tools:context=".presentation.screen.current_user.CurrentUserFragment">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imgAvatar"

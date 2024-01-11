@@ -1,4 +1,4 @@
-package com.example.userlist.presentation.current_user
+package com.example.userlist.presentation.screen.current_user
 
 import android.view.View
 import android.widget.Toast
@@ -16,7 +16,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CurrentUserFragment : BaseFragment<FragmentCurrentUserBinding>(FragmentCurrentUserBinding::inflate) {
+class CurrentUserFragment :
+    BaseFragment<FragmentCurrentUserBinding>(FragmentCurrentUserBinding::inflate) {
 
     private val viewModel: CurrentUserViewModel by viewModels()
     private val args: CurrentUserFragmentArgs by navArgs()
@@ -54,7 +55,8 @@ class CurrentUserFragment : BaseFragment<FragmentCurrentUserBinding>(FragmentCur
                         }
 
                         is Resource.Error -> {
-                            Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireContext(), it.errorMessage, Toast.LENGTH_LONG)
+                                .show()
                             binding.progressBar.visibility = View.GONE
                         }
 

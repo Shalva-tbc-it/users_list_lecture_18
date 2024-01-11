@@ -1,4 +1,4 @@
-package com.example.userlist.presentation.home.adapter
+package com.example.userlist.presentation.screen.home.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,7 +10,9 @@ import com.example.userlist.R
 import com.example.userlist.databinding.RecyclerUserBinding
 import com.example.userlist.presentation.model.Users
 
-class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.UserListViewHolder>(UserListDiffCallback()) {
+class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.UserListViewHolder>(
+    UserListDiffCallback()
+) {
 
     private var onItemClickListener: ((Users) -> Unit)? = null
     private var onItemLongClickListener: ((Users) -> Unit)? = null
@@ -36,9 +38,7 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
                         binding.root.setBackgroundResource(R.drawable.bg_active_user)
                     } else {
                         binding.root.setBackgroundResource(0)
-
                     }
-//                    activeUserBg.add(users)
                     return@setOnLongClickListener true
                 }
                 return@setOnLongClickListener false
@@ -49,11 +49,9 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
                     if (users.isSelect) {
                         it.invoke(users)
                         binding.root.setBackgroundResource(R.drawable.bg_active_user)
-//                        activeUserBg.add(users)
                     } else {
                         it.invoke(users)
                         binding.root.setBackgroundResource(0)
-//                        activeUserBg.remove(users)
                     }
 
                 }
@@ -89,8 +87,6 @@ class UserListRecyclerAdapter() : ListAdapter<Users, UserListRecyclerAdapter.Use
 
     override fun onBindViewHolder(holder: UserListViewHolder, position: Int) {
         holder.bind()
-//        holder.itemView.setBackgroundResource(0)
-
     }
 
 }

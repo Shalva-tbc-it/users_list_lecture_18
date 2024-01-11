@@ -1,4 +1,4 @@
-package com.example.userlist.presentation.home
+package com.example.userlist.presentation.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,9 +20,6 @@ class HomeViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase
 ) : ViewModel() {
 
-//    private val _usersList = MutableStateFlow<Resource<List<Users>>?>(Resource.Loading())
-//    val UsersList: StateFlow<Resource<List<Users>>?> = _usersList.asStateFlow()
-
     private val _usersList = MutableStateFlow<List<Users>>(emptyList())
     val usersList: StateFlow<List<Users>> = _usersList.asStateFlow()
 
@@ -32,18 +29,17 @@ class HomeViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-//    private val _excludedUserIds = MutableStateFlow<List<Int>>(emptyList())
-//    val excludedUserIds: StateFlow<List<Int>> = _excludedUserIds.asStateFlow()
-
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
 
     init {
         getUsersList()
     }
 
     fun onEvent(event: OnEvent) {
-        when(event) {
+        when (event) {
             is OnEvent.Listener -> getListener(id = event.userId)
-            is OnEvent.Filter -> getUsersList()
+            is OnEvent.CleanData -> getUsersList()
             is OnEvent.IsSelect -> getUserForDeleteCheck(users = event.users)
             is OnEvent.IsUnSelect -> getUserForDeleteUncheck(users = event.users)
             is OnEvent.DeleteUsers -> deleteUser()
@@ -53,31 +49,23 @@ class HomeViewModel @Inject constructor(
     private fun getUsersList() {
         viewModelScope.launch {
             getUsersUseCase.invoke().collect { resource ->
-                when(resource) {
+                when (resource) {
                     is Resource.Success -> {
-                        _usersList.value = resource.data.map { it.copy(errorStatus = Users.Status.SUCCESS) }
+                        _usersList.value = resource.data.map { it.copy() }
                         _loading.value = false
                     }
+
                     is Resource.Error -> {
-                        _usersList.value = _usersList.value.map { it.copy(errorStatus = Users.Status.ERROR) }
+                        _usersList.value = _usersList.value.map { it.copy() }
+                        _errorMessage.value = resource.errorMessage
                         _loading.value = false
                     }
+
                     is Resource.Loading -> {
                         _loading.value = true
                     }
                 }
             }
-//            getUsersUseCase.invoke().map { resource ->
-//                if (resource is Resource.Success) {
-//                    resource.copy(data = resource.data.filterNot { user ->
-//                        user.id in excludedUserIds.value
-//                    })
-//                } else {
-//                    resource
-//                }
-//            }.collect {
-//                _usersList.value = _usersList.value.map { it.copy(isSelect = false) }
-//            }
         }
     }
 
@@ -104,17 +92,5 @@ class HomeViewModel @Inject constructor(
             _navigationEvent.emit(NavigationEvent.NavigateToCurrentUser(userId = id))
         }
     }
-
-//    private fun userId(id: MutableList<Int>) {
-//        viewModelScope.launch {
-//            _excludedUserIds.value = id
-//        }
-//        if (id.isEmpty()) {
-//            _excludedUserIds.value = emptyList()
-//        }
-//        getUsersList()
-//    }
-
-
 
 }

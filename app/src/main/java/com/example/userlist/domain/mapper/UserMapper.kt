@@ -11,6 +11,5 @@ fun GetUsers.toPresentation() : Users {
         lastName = lastName,
         avatar = avatar,
         isSelect = false,
-        errorStatus = Users.Status.SUCCESS
     )
 }

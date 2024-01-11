@@ -1,4 +1,4 @@
-package com.example.userlist.presentation.current_user
+package com.example.userlist.presentation.screen.current_user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

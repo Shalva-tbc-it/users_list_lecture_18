@@ -6,12 +6,6 @@ data class Users (
     val firstName: String,
     val lastName: String,
     val avatar: String,
-    val isSelect: Boolean = false,
-    val errorStatus: Status
-) {
-    enum class Status() {
-        SUCCESS,
-        ERROR
-    }
-}
+    val isSelect: Boolean = false
+)
 
